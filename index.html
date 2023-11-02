@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thai Flashcards</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-weight: normal;
+        }
+
+        body {
+            color: #ECEFF1;
+            background: #222;
+            text-align: center;
+            padding: 1em;
+        }
+
+        #app {
+            position: absolute;
+            top: 0;
+            left: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            width: 100vw;
+        }
+
+        .letter {
+            font-size: 100pt;
+            height: 50%;
+        }
+
+        .phrase {
+            padding: 1em;
+            font-size: 30pt;
+        }
+
+        .back-menu {
+            position: fixed;
+            top: 3px;
+            left: 10px;
+            font-size: 26px;
+            color: #fff;
+            z-index: 1;
+        }
+    </style>
+    <script>
+        const alphabet = [
+            { "letter": "กอ", "thaiName": "ก ไก่", "phrase": "ก เอ๋ย ก ไก่" },
+            { "letter": "ขอ", "thaiName": "ข ไข่", "phrase": "ข ไข่ อยู่ในเล้า" },
+            { "letter": "ฃอ", "thaiName": "ฃ ขวด", "phrase": "ฃ ขวด ของเรา" },
+            { "letter": "คอ", "thaiName": "ค ควาย", "phrase": "ค ควาย เข้านา" },
+            { "letter": "ฅอ", "thaiName": "ฅ คน", "phrase": "ฅ คน ขึงขัง" },
+            { "letter": "ฆอ", "thaiName": "ฆ ระฆัง", "phrase": "ฆ ระฆัง ข้างฝา" },
+            { "letter": "งอ", "thaiName": "ง งู", "phrase": "ง งู ใจกล้า" },
+            { "letter": "จอ", "thaiName": "จ จาน", "phrase": "จ จาน ใช้ดี" },
+            { "letter": "ฉอ", "thaiName": "ฉ ฉิ่ง", "phrase": "ฉ ฉิ่ง ตีดัง" },
+            { "letter": "ชอ", "thaiName": "ช ช้าง", "phrase": "ช ช้าง วิ่งหนี" },
+            { "letter": "ซอ", "thaiName": "ซ โซ่", "phrase": "ซ โซ่ ล่ามที" },
+            { "letter": "ฌอ", "thaiName": "ฌ เฌอ", "phrase": "ฌ กะเฌอ คู่กัน" },
+            { "letter": "ญอ", "thaiName": "ญ หญิง", "phrase": "ญ หญิง โสภา" },
+            { "letter": "ฎอ", "thaiName": "ฎ ชฎา", "phrase": "ฎ ชะฎา สวมพลัน" },
+            { "letter": "ฏอ", "thaiName": "ฏ ปฏัก", "phrase": "ฏ ปะฏัก หุนหัน" },
+            { "letter": "ฐอ", "thaiName": "ฐ ฐาน", "phrase": "ฐ สันฐาน เข้ามารอง" },
+            { "letter": "ฑอ", "thaiName": "ฑ มณโฑ", "phrase": "ฑ นางมนโฑ หน้าขาว" },
+            { "letter": "ฒอ", "thaiName": "ฒ ผู้เฒ่า", "phrase": "ฒ ผู้เฒ่า เดินย่อง" },
+            { "letter": "ณอ", "thaiName": "ณ เณร", "phrase": "ณ เณร ไม่มอง" },
+            { "letter": "ดอ", "thaiName": "ด เด็ก", "phrase": "ด เด็ก ต้องนิมนต์" },
+            { "letter": "ตอ", "thaiName": "ต เต่า", "phrase": "ต เต่า หลังตุง" },
+            { "letter": "ถอ", "thaiName": "ถ ถุง", "phrase": "ถ ถุง แบกขน" },
+            { "letter": "ทอ", "thaiName": "ท ทหาร", "phrase": "ท ทหาร อดทน" },
+            { "letter": "ธอ", "thaiName": "ธ ธง", "phrase": "ธ ธง คนนิยม" },
+            { "letter": "นอ", "thaiName": "น หนู", "phrase": "น หนู ขวักไขว่" },
+            { "letter": "บอ", "thaiName": "บ ใบไม้", "phrase": "บ ใบไม้ ทับถม" },
+            { "letter": "ปอ", "thaiName": "ป ปลา", "phrase": "ป ปลา ตากลม" },
+            { "letter": "ผอ", "thaiName": "ผ ผึ้ง", "phrase": "ผ ผึ้ง ทำรัง" },
+            { "letter": "ฝอ", "thaiName": "ฝ ฝา", "phrase": "ฝ ฝา ทนทาน" },
+            { "letter": "พอ", "thaiName": "พ พาน", "phrase": "พ พาน วางตั้ง" },
+            { "letter": "ฟอ", "thaiName": "ฟ ฟัน", "phrase": "ฟ ฟัน สะอาดจัง" },
+            { "letter": "ภอ", "thaiName": "ภ สำเภา", "phrase": "ภ สำเภา กางใบ" },
+            { "letter": "มอ", "thaiName": "ม ม้า", "phrase": "ม ม้า คึกคัก" },
+            { "letter": "ยอ", "thaiName": "ย ยักษ์", "phrase": "ย ยัก เขี้ยวใหญ่" },
+            { "letter": "รอ", "thaiName": "ร เรือ", "phrase": "ร เรือ พายไป" },
+            { "letter": "ลอ", "thaiName": "ล ลิง", "phrase": "ล ลิง ไต่ราว" },
+            { "letter": "วอ", "thaiName": "ว แหวน", "phrase": "ว แหวน ลงยา" },
+            { "letter": "ศอ", "thaiName": "ศ ศาลา", "phrase": "ศ ศาลา เงียบเหงา" },
+            { "letter": "ษอ", "thaiName": "ษ ฤๅษี", "phrase": "ษ ฤษี หนวดยาว" },
+            { "letter": "สอ", "thaiName": "ส เสือ", "phrase": "ส เสือ ดาวคะนอง" },
+            { "letter": "หอ", "thaiName": "ห หีบ", "phrase": "ห หีบ ใส่ผ้า" },
+            { "letter": "ฬอ", "thaiName": "ฬ จุฬา", "phrase": "ฬ จุฬา ท่าผยอง" },
+            { "letter": "ออ", "thaiName": "อ อ่าง", "phrase": "อ อ่าง เนืองนอง" },
+            { "letter": "ฮอ", "thaiName": "ฮ นกฮูก", "phrase": "ฮ นกฮูก ตาโต" },
+        ];
+
+        function createCardHtml(card) {
+            var template = document.createElement('template');
+            template.innerHTML = `
+                <div class="card">
+                    <div class="letter">${card.letter}</div>
+                    <div class="phrase">${card.phrase}</div>
+                </div>
+            `.trim();
+            return template.content.firstChild;
+        }
+
+        window.addEventListener("load", function () {
+            var cards = alphabet.map(createCardHtml); // in order by default
+            var index = -1;
+            const app = document.getElementById("app");
+            const back = document.querySelector(".back-menu");
+
+            function showNextCard() {
+                if (index == cards.length - 1) {
+                    return;
+                }
+                app.replaceChildren(cards[++index]);
+            }
+            function showPrevCard() {
+                if (index == 0) {
+                    return;
+                }
+                app.replaceChildren(cards[--index]);
+            }
+            app.addEventListener("click", showNextCard, false);
+            back.addEventListener("click", showPrevCard, false);
+
+            showNextCard();
+        }, false);
+
+    </script>
+
+</head>
+
+<body>
+    <div class="back-menu">
+        🡠
+    </div>
+    <div id="app">
+    </div>
+</body>
+
+</html>
